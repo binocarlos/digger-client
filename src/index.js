@@ -37,3 +37,5 @@ module.exports = function(handle){
 	var supplychain = SupplyChain(handle);
 	return supplychain;
 }
+
+module.exports.Container = Container;
