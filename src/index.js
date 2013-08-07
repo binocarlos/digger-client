@@ -16,16 +16,17 @@
   Module dependencies.
 */
 
-var Container = require('digger-container');
 var SupplyChain = require('digger-supplychain');
+var Container = require('digger-container');
 
 /*
 
 	setup the full container api for the client
 	
 */
-Container.augment_prototype(require('digger-find'));
 Container.augment_prototype(require('digger-contracts'));
+Container.augment_prototype(require('digger-find'));
+
 
 /*
 
@@ -34,7 +35,7 @@ Container.augment_prototype(require('digger-contracts'));
 	
 */
 module.exports = function(handle){
-	var supplychain = SupplyChain(handle);
+	var supplychain = SupplyChain(handle, Container);
 	return supplychain;
 }
 
