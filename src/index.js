@@ -17,16 +17,6 @@
 */
 
 var SupplyChain = require('digger-supplychain');
-var Container = require('digger-container');
-
-/*
-
-	setup the full container api for the client
-	
-*/
-Container.augment_prototype(require('digger-contracts'));
-Container.augment_prototype(require('digger-find'));
-
 
 /*
 
@@ -34,9 +24,7 @@ Container.augment_prototype(require('digger-find'));
 	returns a $digger from which you can connect to containers and warehouses
 	
 */
-module.exports = function(handle){
-	var supplychain = SupplyChain(handle, Container);
+module.exports = function(handler){
+	var supplychain = new SupplyChain(handler);
 	return supplychain;
 }
-
-module.exports.Container = Container;

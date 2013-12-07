@@ -1,27 +1,35 @@
 digger-client
 =============
 
-A bundle of digger-* modules that is used as the generic $digger network client.
+![Build status](https://api.travis-ci.org/binocarlos/digger-client.png)
 
- * [digger-container](https://github.com/binocarlos/digger-container) - wrapper for model data
- * [digger-find](https://github.com/binocarlos/digger-find) - searches local models
- * [digger-selector](https://github.com/binocarlos/digger-selector) - parses selectors into query objects
- * [digger-contracts](https://github.com/binocarlos/digger-contracts) - create HTTP request objects from containers
- * [digger-supplychain](https://github.com/binocarlos/digger-supplychain) - connect to external locations to run requests
- * [digger-utils](https://github.com/binocarlos/digger-utils) - general shared util functions
+Client for a [digger](https://github.com/binocarlos/digger) network.
 
+Combines [digger-bundle](https://github.com/binocarlos/digger-bundle) with [digger-supplychain](https://github.com/binocarlos/digger-supplychain)
+
+## install
+
+```
+$ npm install digger-client
+```
 
 ## usage
 
-You create a client by passing a [digger-supplychain](https://github.com/binocarlos/digger-supplychain) handler function.
+The module returns a supplychain object that emits the following events:
 
-This function accepts the request object and reply callback.
+ * request
+ * radio:talk
+ * radio:listen
+ * radio:cancel
+
+You 'connect' to get a container that is pointing at a warehouse path:
 
 ```js
-
 var Client = require('digger-client');
 
-var $digger = Client(function(req, reply){
+var $digger = Client();
+
+$digger.on('request', function(req, reply){
 	// deal with the request somehow
 })
 
@@ -34,7 +42,6 @@ container('some.selector').ship(function(results){
 	// digger-find is included so we can search local results
 	console.log(results.find('#thing3').summary());
 })
-
 ```
 
 ## licence
