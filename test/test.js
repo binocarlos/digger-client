@@ -4,7 +4,7 @@ describe('diggerclient', function(){
 
   it('should connect a container', function(done) {
 
-    var $digger = Client();
+    var $digger = new Client();
 
     $digger.on('request', function(req, reply){
     	reply(null, [{

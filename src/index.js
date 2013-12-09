@@ -24,7 +24,4 @@ var SupplyChain = require('digger-supplychain');
 	returns a $digger from which you can connect to containers and warehouses
 	
 */
-module.exports = function(handler){
-	var supplychain = new SupplyChain(handler);
-	return supplychain;
-}
+module.exports = SupplyChain;
