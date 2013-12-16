@@ -28,6 +28,8 @@
     "should": "~2.1.0"
   },
   "dependencies": {
-    "digger-supplychain": "*"
+    "digger-supplychain": "*",
+    "digger-blueprints": "*",
+    "digger-utils": "*"
   }
 }

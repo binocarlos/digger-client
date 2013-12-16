@@ -17,11 +17,37 @@
 */
 
 var SupplyChain = require('digger-supplychain');
+var Blueprints = require('digger-blueprints');
+var utils = require('digger-utils');
 
 /*
 
-	the client factory - you pass a handle function for requests and it
-	returns a $digger from which you can connect to containers and warehouses
+	we construct the global $digger using this factory function
+
+	we pass it the environment options such as:
+
+		hostname of the digger server (to connect the socket to)
 	
 */
-module.exports = SupplyChain;
+module.exports = function(config){
+
+	config = config || {};
+
+	// the object we return
+	var $digger = new SupplyChain();
+
+	var user = null;
+	if(config.user){
+		user = config.user;
+		user = JSON.parse(JSON.stringify(user));	
+		user._fullname = user.fullname;
+	}
+	
+	$digger.config = config;
+	$digger.user = user;
+	$digger.blueprint = Blueprints($digger);
+	$digger.littleid = utils.littleid;
+	$digger.diggerid = utils.diggerid;
+
+	return $digger;
+}
