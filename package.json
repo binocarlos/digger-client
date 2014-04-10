@@ -1,6 +1,6 @@
 {
   "name": "digger-client",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A bundle of digger-* modules that works well as a basic client for digger.io warehouses",
   "main": "src/index.js",
   "scripts": {
