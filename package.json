@@ -23,13 +23,14 @@
   },
   "devDependencies": {
     "mocha": "~1.14.0",
-    "mocha-phantomjs": "~3.1.6",
-    "browserify": "~2.36.1",
     "should": "~2.1.0"
   },
   "dependencies": {
-    "digger-supplychain": "~0.4.3",
-    "digger-blueprints": "~1.5.1",
-    "digger-utils": "~1.2.2"
+    "digger-contracts": "^1.0.0",
+    "digger-utils": "^2.0.1",
+    "digger-find": "^0.1.6",
+    "digger-container": "^2.1.2",
+    "concat-stream": "^1.4.4",
+    "through": "^2.3.4"
   }
 }

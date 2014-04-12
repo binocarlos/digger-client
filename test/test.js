@@ -1,66 +1,64 @@
 var Client = require('../src');
+var through = require('through');
 
 describe('diggerclient', function(){
 
-  it('should connect a container', function(done) {
+	describe('constructor', function(){
+	  it('should be a function', function() {
+	    Client.should.be.type('function');
+	  })
 
-    var $digger = Client();
+	  it('should return an event emitter', function(done) {
+	  	var $digger = Client();
+	  	$digger.on('hello', done);
+	  	$digger.emit('hello');
+	  })
+	})
 
-    $digger.on('request', function(req, reply){
-    	reply(null, [{
-    		_digger:{
-    			tag:'apple'
-    		}
-    	}])
-    })
+	describe('supplychain', function(){
 
-    var container = $digger.connect('/');
+		it('should return a supplychain from connect', function() {
+			var $digger = Client();
 
-    container.tag().should.equal('_supplychain');
-    container.diggerurl().should.equal('/');
+			var supplychain = $digger.connect('/my/warehouse');
 
-    container('something').ship.should.be.type('function');
+			supplychain.tag().should.equal('_supplychain');
+			supplychain.diggerurl().should.equal('/my/warehouse');
+		})
 
-    container('fruit').ship(function(results){
-    	results.count().should.equal(1);
-    	results.tag().should.equal('apple');
-    	done();
-    })
-  })
 
-  it('should accept a user', function(done) {
+		it('should get a request packet from an event', function(done) {
+			var $digger = Client();
 
-    var $digger = Client({
-      user:{
-        fullname:'Bob',
-        id:10
-      }
-    });
+			$digger.on('request', function(req, res){
+				req.method.should.equal('post');
+				req.url.should.equal('/digger');
+				req.headers['Content-Type'].should.equal('application/json')
+				req.body.method.should.equal('post');
+				req.body.url.should.equal('/select');
+				res.write({
+					name:'test1'
+				})
+				res.write({
+					name:'test2'
+				})
+				res.write({
+					name:'test3'
+				})
+				res.end();
+			})
 
-    $digger.user.fullname.should.equal('Bob');
-    $digger.user.id.should.equal(10);
-    done();
-  })
+			var supplychain = $digger.connect('/my/warehouse');
 
-  it('should include the blueprint API', function(done) {
+			supplychain('folder').ship(function(results){
+				results.length.should.equal(3);
+				results[0].name.should.equal('test1');
+				results[1].name.should.equal('test2');
+				results[2].name.should.equal('test3');
+				done();
+			})
+		})
 
-    var $digger = Client();
-
-    var print = $digger.create({
-      _digger:{
-        tag:'blueprint'
-      },
-      name:'test'
-    })
-
-    $digger.blueprint.add(print);
-
-    var print = $digger.blueprint.get('test');
-
-    print.count().should.equal(1);
-    done();
-
-  })
-
+	})
 
 })
