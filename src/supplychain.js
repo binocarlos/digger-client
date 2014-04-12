@@ -82,3 +82,9 @@ SupplyChain.prototype.connect = function(path){
 	container.supplychain = this;
 	return container;
 }
+
+SupplyChain.prototype.create = function(tag, data){
+  var container = Container(tag, data);
+  container.supplychain = this;
+  return container;
+}
