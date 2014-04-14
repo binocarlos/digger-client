@@ -47,7 +47,7 @@ SupplyChain.prototype.createContractStream = function(r){
   stream.req = req;
   stream.res = res;
 
-  self.emit('contract', req, res);
+  self.emit('request', req, res);
 
   return stream;
 }
@@ -70,23 +70,29 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
     }
   });
 
-  if(fn){
-    contractStream.pipe(concat(function(models){
+  contractStream.pipe(concat(function(models){
+    if(contractStream.res.statusCode===500){
+      contractStream.emit('error', models);
+    }
+    else{
       contract.emit('success', models);
       contract.emit('complete', null, models);
-      fn && fn(models);
-    }))
+      fn && fn(models);  
+    }
+    
+  }))
 
-    contractStream.on('error', function(error){
-      contract.emit('failure', error);
-      contract.emit('complete', error);
-      errorfn && errorfn(error);
-    })
-  }
+  contractStream.on('error', function(error){
+    contract.emit('failure', error);
+    contract.emit('complete', error);
+    errorfn && errorfn(error);
+  })
 
   contractStream.end(contract.req);
+
+  contract.stream = contractStream;
   
-  return contractStream;
+  return contract;
 }
 
 SupplyChain.prototype.connect = function(path){

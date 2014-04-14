@@ -29,7 +29,7 @@ describe('diggerclient', function(){
 		it('should do a simple ship request', function(done) {
 			var supplychain = Client();
 
-			supplychain.on('contract', function(req, res){
+			supplychain.on('request', function(req, res){
 
 				req.method.should.equal('post')
 				req.url.should.equal('/ship')
@@ -75,7 +75,7 @@ describe('diggerclient', function(){
 		it('should do a simple streaming request', function(done) {
 			var supplychain = Client();
 
-			supplychain.on('contract', function(req, res){
+			supplychain.on('request', function(req, res){
 
 				req.method.should.equal('post')
 				req.url.should.equal('/select')
@@ -119,6 +119,35 @@ describe('diggerclient', function(){
 			})
 
 			contract.end();
+		})
+
+
+		it('should catch a streaming error in the ship handler', function(done) {
+			var supplychain = Client();
+
+			supplychain.on('request', function(req, res){
+
+				req.method.should.equal('post')
+				req.url.should.equal('/ship')
+				req.headers['Content-Type'].should.equal('application/json')
+
+				req.pipe(through(function(chunk){
+					
+				}, function(){
+					res.statusCode = 500;
+					res.end('this is a test error')
+				}))
+
+			})
+
+			var $digger = supplychain.connect('/my/warehouse');
+
+			var contract = $digger('folder').ship(function(){
+
+			}, function(error){
+				error.should.equal('this is a test error');
+				done();
+			})
 		})
 
 	})
