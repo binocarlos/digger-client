@@ -26,37 +26,99 @@ describe('diggerclient', function(){
 			supplychain.diggerurl().should.equal('/my/warehouse');
 		})
 
+		it('should do a simple ship request', function(done) {
+			var supplychain = Client();
 
-		it('should get a request packet from an event', function(done) {
-			var $digger = Client();
+			supplychain.on('contract', function(req, res){
 
-			$digger.on('request', function(req, res){
-				req.method.should.equal('post');
-				req.url.should.equal('/digger');
+				req.method.should.equal('post')
+				req.url.should.equal('/ship')
 				req.headers['Content-Type'].should.equal('application/json')
-				req.body.method.should.equal('post');
-				req.body.url.should.equal('/select');
-				res.write({
-					name:'test1'
-				})
-				res.write({
-					name:'test2'
-				})
-				res.write({
-					name:'test3'
-				})
-				res.end();
+
+				req.pipe(through(function(contract){
+
+					contract.method.should.equal('post')
+					contract.url.should.equal('/select')
+					contract.headers['Content-Type'].should.equal('application/json')
+					contract.headers['x-digger-selector'].should.equal('folder')
+					contract.body.length.should.equal(1);
+					contract.body[0].should.equal('/my/warehouse');
+
+						
+					res.write({
+						name:'test1'
+					})
+					res.write({
+						name:'test2'
+					})
+					res.write({
+						name:'test3'
+					})
+					res.end();
+					
+				}))
+
 			})
 
-			var supplychain = $digger.connect('/my/warehouse');
+			var $digger = supplychain.connect('/my/warehouse');
 
-			supplychain('folder').ship(function(results){
+			$digger('folder').ship(function(results){
 				results.length.should.equal(3);
 				results[0].name.should.equal('test1');
 				results[1].name.should.equal('test2');
 				results[2].name.should.equal('test3');
 				done();
 			})
+		})
+
+
+		it('should do a simple streaming request', function(done) {
+			var supplychain = Client();
+
+			supplychain.on('contract', function(req, res){
+
+				req.method.should.equal('post')
+				req.url.should.equal('/select')
+				req.headers['Content-Type'].should.equal('application/json')
+				req.headers['x-digger-selector'].should.equal('folder')
+
+				req.pipe(through(function(chunk){
+					chunk.count = (chunk.id * 2) + 1;
+					res.write(chunk)
+				}, function(){
+					res.end()
+				}))
+
+			})
+
+			var $digger = supplychain.connect('/my/warehouse');
+
+			var contract = $digger('folder').stream()
+
+			var results = {};
+			contract.pipe(through(function(chunk){
+				results[chunk.id] = chunk.count;
+				this.queue(chunk)
+			}, function(){
+				results['5'].should.equal(11);
+				results['6'].should.equal(13);
+				results['7'].should.equal(15);
+				done();
+			}))
+
+			contract.write({
+				id:5
+			})
+
+			contract.write({
+				id:6
+			})
+
+			contract.write({
+				id:7
+			})
+
+			contract.end();
 		})
 
 	})

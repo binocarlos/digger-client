@@ -1,10 +1,11 @@
 var EventEmitter = require('events').EventEmitter;
 var utils = require('digger-utils');
-var concat = require('concat-stream');
 var Container = require('digger-container');
 var Contracts = require('digger-contracts');
 var Find = require('digger-find');
+var concat = require('concat-stream');
 var through = require('through');
+var duplexer = require('duplexer');
 
 function augment_prototype(api){
   for(var prop in api){
@@ -27,34 +28,47 @@ utils.inherits(SupplyChain, EventEmitter);
 
 module.exports = SupplyChain;
 
-SupplyChain.prototype.stream = function(contract, fn){
+SupplyChain.prototype.createContractStream = function(r){
   var self = this;
-  var req = {
-    method:'post',
-    url:'/digger',
-    headers:{
-      'Content-Type':'application/json'
-    },
-    body:contract.req
-  }
 
-  var stream = through(function(model){
-    this.queue(model)
-  }, function(){
-    this.queue(null)
-  })
+  // we write out request input to here
+  var req = through();
 
-  process.nextTick(function(){
-    self.emit('request', req, stream);  
-  })
-  
+  req.method = r.method;
+  req.url = r.url;
+  req.headers = r.headers;
+
+  // we read our results from here
+  var res = through();
+
+  // the combo stream we return to the user
+  var stream = duplexer(req, res);
+
+  stream.req = req;
+  stream.res = res;
+
+  self.emit('contract', req, res);
+
   return stream;
+}
+
+// leave the body input up to the user
+SupplyChain.prototype.stream = function(contract){
+  var self = this;
+  delete(contract.req.body);
+  return this.createContractStream(contract.req);
 }
 
 SupplyChain.prototype.ship = function(contract, fn, errorfn){
 	var self = this;
 
-  var contractStream = this.stream(contract);
+  var contractStream = this.createContractStream({
+    url:'/ship',
+    method:'post',
+    headers:{
+      'Content-Type':'application/json'
+    }
+  });
 
   if(fn){
     contractStream.pipe(concat(function(models){
@@ -70,7 +84,9 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
     })
   }
 
-  return contract;
+  contractStream.end(contract.req);
+  
+  return contractStream;
 }
 
 SupplyChain.prototype.connect = function(path){
