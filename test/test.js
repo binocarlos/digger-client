@@ -34,9 +34,9 @@ describe('diggerclient', function(){
 				req.method.should.equal('post')
 				req.url.should.equal('/ship')
 				req.headers['Content-Type'].should.equal('application/json')
-
+				
 				req.pipe(through(function(contract){
-
+				
 					contract.method.should.equal('post')
 					contract.url.should.equal('/select')
 					contract.headers['Content-Type'].should.equal('application/json')
@@ -63,10 +63,10 @@ describe('diggerclient', function(){
 			var $digger = supplychain.connect('/my/warehouse');
 
 			$digger('folder').ship(function(results){
-				results.length.should.equal(3);
-				results[0].name.should.equal('test1');
-				results[1].name.should.equal('test2');
-				results[2].name.should.equal('test3');
+				results.count().should.equal(3);
+				results.get(0).name.should.equal('test1');
+				results.get(1).name.should.equal('test2');
+				results.get(2).name.should.equal('test3');
 				done();
 			})
 		})
@@ -78,9 +78,11 @@ describe('diggerclient', function(){
 			supplychain.on('request', function(req, res){
 
 				req.method.should.equal('post')
-				req.url.should.equal('/select')
-				req.headers['Content-Type'].should.equal('application/json')
-				req.headers['x-digger-selector'].should.equal('folder')
+				req.url.should.equal('/stream')
+
+				var contract = req.headers['x-digger-contract'];
+				contract.headers['Content-Type'].should.equal('application/json')
+				contract.headers['x-digger-selector'].should.equal('folder')
 
 				req.pipe(through(function(chunk){
 					chunk.count = (chunk.id * 2) + 1;
@@ -131,12 +133,8 @@ describe('diggerclient', function(){
 				req.url.should.equal('/ship')
 				req.headers['Content-Type'].should.equal('application/json')
 
-				req.pipe(through(function(chunk){
-					
-				}, function(){
-					res.statusCode = 500;
-					res.end('this is a test error')
-				}))
+				res.statusCode = 500;
+				res.end('this is a test error')
 
 			})
 

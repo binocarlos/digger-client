@@ -47,16 +47,27 @@ SupplyChain.prototype.createContractStream = function(r){
   stream.req = req;
   stream.res = res;
 
-  self.emit('request', req, res);
-
   return stream;
 }
 
 // leave the body input up to the user
 SupplyChain.prototype.stream = function(contract){
   var self = this;
+
+  // a stream contract should not have a body
+  // the body should be piped into this stream
   delete(contract.req.body);
-  return this.createContractStream(contract.req);
+
+  var stream = this.createContractStream({
+    url:'/stream',
+    method:'post',
+    headers:{
+      'x-digger-contract':contract.req
+    }
+  })
+
+  self.emit('request', stream.req, stream.res);
+  return stream;
 }
 
 SupplyChain.prototype.ship = function(contract, fn, errorfn){
@@ -75,9 +86,10 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
       contractStream.emit('error', models);
     }
     else{
-      contract.emit('success', models);
-      contract.emit('complete', null, models);
-      fn && fn(models);  
+      var container = self.create(models);
+      contract.emit('success', container);
+      contract.emit('complete', null, container);
+      fn && fn(container);  
     }
     
   }))
@@ -88,9 +100,15 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
     errorfn && errorfn(error);
   })
 
-  contractStream.end(contract.req);
 
   contract.stream = contractStream;
+
+  self.emit('request', contractStream.req, contractStream.res);
+
+  setTimeout(function(){
+    contractStream.end(contract.req);  
+  })
+  
   
   return contract;
 }
