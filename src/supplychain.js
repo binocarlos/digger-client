@@ -3,9 +3,10 @@ var utils = require('digger-utils');
 var Container = require('digger-container');
 var Contracts = require('digger-contracts');
 var Find = require('digger-find');
+
 var concat = require('concat-stream');
-var through = require('through');
-var duplexer = require('duplexer');
+var through = require('through2');
+var duplexer = require('reduplexer');
 
 function augment_prototype(api){
   for(var prop in api){
@@ -32,17 +33,19 @@ SupplyChain.prototype.createContractStream = function(r){
   var self = this;
 
   // we write out request input to here
-  var req = through();
+  var req = through.obj();
 
   req.method = r.method;
   req.url = r.url;
   req.headers = r.headers;
 
   // we read our results from here
-  var res = through();
+  var res = through.obj();
 
   // the combo stream we return to the user
-  var stream = duplexer(req, res);
+  var stream = duplexer(req, res, {
+    objectMode: true
+  });
 
   stream.req = req;
   stream.res = res;

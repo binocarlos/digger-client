@@ -1,5 +1,5 @@
 var Client = require('../src');
-var through = require('through');
+var through = require('through2');
 
 describe('diggerclient', function(){
 
@@ -35,7 +35,7 @@ describe('diggerclient', function(){
 				req.url.should.equal('/ship')
 				req.headers['Content-Type'].should.equal('application/json')
 				
-				req.pipe(through(function(contract){
+				req.pipe(through.obj(function(contract, enc, cb){
 				
 					contract.method.should.equal('post')
 					contract.url.should.equal('/select')
@@ -84,9 +84,10 @@ describe('diggerclient', function(){
 				contract.headers['Content-Type'].should.equal('application/json')
 				contract.headers['x-digger-selector'].should.equal('folder')
 
-				req.pipe(through(function(chunk){
+				req.pipe(through.obj(function(chunk, enc, cb){
 					chunk.count = (chunk.id * 2) + 1;
 					res.write(chunk)
+					cb()
 				}, function(){
 					res.end()
 				}))
@@ -98,9 +99,10 @@ describe('diggerclient', function(){
 			var contract = $digger('folder').stream()
 
 			var results = {};
-			contract.pipe(through(function(chunk){
+			contract.pipe(through.obj(function(chunk, enc, cb){
 				results[chunk.id] = chunk.count;
-				this.queue(chunk)
+				this.push(chunk)
+				cb()
 			}, function(){
 				results['5'].should.equal(11);
 				results['6'].should.equal(13);
@@ -147,6 +149,7 @@ describe('diggerclient', function(){
 				done();
 			})
 		})
+
 
 	})
 
