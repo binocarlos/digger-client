@@ -28,11 +28,11 @@
   "dependencies": {
     "digger-contracts": "^1.0.0",
     "digger-utils": "^2.0.1",
-    "digger-find": "^0.1.6",
+    "digger-find": "^0.2.0",
     "digger-container": "^2.1.2",
     "concat-stream": "^1.4.4",
     "through2": "^0.4.1",
-    "from2": "0.0.0",
-    "reduplexer": "0.0.2"
+    "from2": "^0.0.0",
+    "reduplexer": "^0.0.2"
   }
 }
