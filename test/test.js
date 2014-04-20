@@ -42,7 +42,7 @@ describe('diggerclient', function(){
 					contract.headers['Content-Type'].should.equal('application/json')
 					contract.headers['x-digger-selector'].should.equal('folder')
 					contract.body.length.should.equal(1);
-					contract.body[0].should.equal('/my/warehouse');
+					contract.body[0].should.equal('/warehouse/my/warehouse');
 
 						
 					res.write({
