@@ -111,6 +111,7 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
       contractStream.emit('error', models);
     }
     else{
+      models = utils
       var container = self.create(models);
       contract.emit('success', container);
       contract.emit('complete', null, container);

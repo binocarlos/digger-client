@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "digger-contracts": "^1.0.0",
-    "digger-utils": "^2.0.1",
+    "digger-utils": "^3.0.0",
     "digger-find": "^0.2.0",
     "digger-container": "^2.1.2",
     "concat-stream": "^1.4.4",
