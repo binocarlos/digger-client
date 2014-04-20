@@ -1,5 +1,6 @@
 var Client = require('../src');
 var through = require('through2');
+var concat = require('concat-stream')
 
 describe('diggerclient', function(){
 
@@ -72,10 +73,11 @@ describe('diggerclient', function(){
 		})
 
 
-		it('should do a simple streaming request', function(done) {
+		it('should do a simple duplex request', function(done) {
 			var supplychain = Client();
 
 			supplychain.on('request', function(req, res){
+
 
 				req.method.should.equal('post')
 				req.url.should.equal('/stream')
@@ -96,7 +98,7 @@ describe('diggerclient', function(){
 
 			var $digger = supplychain.connect('/my/warehouse');
 
-			var contract = $digger('folder').stream()
+			var contract = $digger('folder').duplex()
 
 			var results = {};
 			contract.pipe(through.obj(function(chunk, enc, cb){
@@ -123,6 +125,52 @@ describe('diggerclient', function(){
 			})
 
 			contract.end();
+		})
+
+	
+
+		it('should do a simple streaming request', function(done) {
+			var supplychain = Client();
+
+			supplychain.on('request', function(req, res){
+
+				req.method.should.equal('post')
+				req.url.should.equal('/ship')
+
+				req.pipe(concat(function(c){
+					var contract = c[0]
+
+					contract.headers['Content-Type'].should.equal('application/json')
+					contract.headers['x-digger-selector'].should.equal('folder')
+
+					contract.body.length.should.equal(1)
+					contract.body[0].should.equal('/warehouse/my/warehouse')
+
+					res.push({id:1,count:2})
+					res.push({id:2,count:4})
+					res.push({id:3,count:6})
+					res.push(null)
+				}))
+
+			})
+
+			var $digger = supplychain.connect('/my/warehouse');
+
+			var contract = $digger('folder').stream()
+
+			var results = {};
+			contract.pipe(through.obj(function(chunk, enc, cb){
+				chunk.count.should.equal(chunk.id*2)
+				results[chunk.id] = chunk.count;
+				this.push(chunk)
+				cb()
+			}, function(){
+				results['1'].should.equal(2);
+				results['2'].should.equal(4);
+				results['3'].should.equal(6);
+				done();
+			}))
+
 		})
 
 
