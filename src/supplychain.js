@@ -53,8 +53,8 @@ SupplyChain.prototype.createContractStream = function(r){
   return stream;
 }
 
-// leave the body input up to the user
-SupplyChain.prototype.stream = function(contract){
+// a ship request on the server but we want streaming results
+SupplyChain.prototype.duplex = function(contract){
   var self = this;
 
   // a stream contract should not have a body
@@ -67,6 +67,28 @@ SupplyChain.prototype.stream = function(contract){
     headers:{
       'x-digger-contract':contract.req
     }
+  });
+
+
+  self.emit('request', stream.req, stream.res);
+  return stream
+}
+
+// leave the body input up to the user
+SupplyChain.prototype.stream = function(contract){
+  var self = this;
+
+  var stream = this.createContractStream({
+    url:'/ship',
+    method:'post',
+    headers:{
+      'Content-Type':'application/json',
+      'x-digger-contract':contract.req
+    }
+  })
+
+  setTimeout(function(){
+    stream.end(contract.req);  
   })
 
   self.emit('request', stream.req, stream.res);
