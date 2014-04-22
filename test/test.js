@@ -42,9 +42,8 @@ describe('diggerclient', function(){
 					contract.url.should.equal('/select')
 					contract.headers['Content-Type'].should.equal('application/json')
 					contract.headers['x-digger-selector'].should.equal('folder')
-					contract.body.length.should.equal(1);
-					contract.body[0].should.equal('/warehouse/my/warehouse');
-
+					contract.body.length.should.equal(1)
+					contract.body[0].should.equal('/warehouse/my/warehouse')
 						
 					res.write({
 						name:'test1'
@@ -55,7 +54,7 @@ describe('diggerclient', function(){
 					res.write({
 						name:'test3'
 					})
-					res.end();
+					res.end()
 					
 				}))
 

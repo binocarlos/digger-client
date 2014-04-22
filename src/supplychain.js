@@ -107,11 +107,11 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
   });
 
   contractStream.pipe(concat(function(models){
+
     if(contractStream.res.statusCode===500){
       contractStream.emit('error', models);
     }
     else{
-      models = utils
       var container = self.create(models);
       contract.emit('success', container);
       contract.emit('complete', null, container);
@@ -134,7 +134,6 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
   setTimeout(function(){
     contractStream.end(contract.req);  
   })
-  
   
   return contract;
 }
