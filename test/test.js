@@ -33,17 +33,17 @@ describe('diggerclient', function(){
 			supplychain.on('request', function(req, res){
 
 				req.method.should.equal('post')
-				req.url.should.equal('/ship')
+				req.url.should.equal('/digger/ship')
 				req.headers['Content-Type'].should.equal('application/json')
 				
 				req.pipe(through.obj(function(contract, enc, cb){
 				
 					contract.method.should.equal('post')
-					contract.url.should.equal('/select')
+					contract.url.should.equal('/digger/select')
 					contract.headers['Content-Type'].should.equal('application/json')
 					contract.headers['x-digger-selector'].should.equal('folder')
 					contract.body.length.should.equal(1)
-					contract.body[0].should.equal('/warehouse/my/warehouse')
+					contract.body[0].should.equal('/my/warehouse')
 						
 					res.write({
 						name:'test1'
@@ -79,7 +79,7 @@ describe('diggerclient', function(){
 
 
 				req.method.should.equal('post')
-				req.url.should.equal('/stream')
+				req.url.should.equal('/digger/stream')
 
 				var contract = req.headers['x-digger-contract'];
 				contract.headers['Content-Type'].should.equal('application/json')
@@ -134,7 +134,7 @@ describe('diggerclient', function(){
 			supplychain.on('request', function(req, res){
 
 				req.method.should.equal('post')
-				req.url.should.equal('/ship')
+				req.url.should.equal('/digger/ship')
 
 				req.pipe(concat(function(c){
 					var contract = c[0]
@@ -143,7 +143,7 @@ describe('diggerclient', function(){
 					contract.headers['x-digger-selector'].should.equal('folder')
 
 					contract.body.length.should.equal(1)
-					contract.body[0].should.equal('/warehouse/my/warehouse')
+					contract.body[0].should.equal('/my/warehouse')
 
 					res.push({id:1,count:2})
 					res.push({id:2,count:4})
@@ -179,7 +179,7 @@ describe('diggerclient', function(){
 			supplychain.on('request', function(req, res){
 
 				req.method.should.equal('post')
-				req.url.should.equal('/ship')
+				req.url.should.equal('/digger/ship')
 				req.headers['Content-Type'].should.equal('application/json')
 
 				res.statusCode = 500;

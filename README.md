@@ -23,6 +23,12 @@ supplychain.on('request', function(req, res){
 })
 ```
 
+Or make a HTTP connected client:
+
+```js
+var supplychain = require('digger-client').http('http://localhost:8080/digger');
+```
+
 Now we have a supplychain hooked up to a transport - we can create containers:
 
 ```js

@@ -62,7 +62,7 @@ SupplyChain.prototype.duplex = function(contract){
   delete(contract.req.body);
 
   var stream = this.createContractStream({
-    url:'/stream',
+    url:utils.urls.stream,
     method:'post',
     headers:{
       'x-digger-contract':contract.req
@@ -79,7 +79,7 @@ SupplyChain.prototype.stream = function(contract){
   var self = this;
 
   var stream = this.createContractStream({
-    url:'/ship',
+    url:utils.urls.ship,
     method:'post',
     headers:{
       'Content-Type':'application/json',
@@ -99,7 +99,7 @@ SupplyChain.prototype.ship = function(contract, fn, errorfn){
 	var self = this;
 
   var contractStream = this.createContractStream({
-    url:'/ship',
+    url:utils.urls.ship,
     method:'post',
     headers:{
       'Content-Type':'application/json'
