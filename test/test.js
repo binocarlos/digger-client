@@ -81,7 +81,7 @@ describe('diggerclient', function(){
 				req.method.should.equal('post')
 				req.url.should.equal('/digger/stream')
 
-				var contract = req.headers['x-digger-contract'];
+				var contract = JSON.parse(req.headers['x-digger-contract'])
 				contract.headers['Content-Type'].should.equal('application/json')
 				contract.headers['x-digger-selector'].should.equal('folder')
 

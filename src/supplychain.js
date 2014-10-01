@@ -65,7 +65,7 @@ SupplyChain.prototype.duplex = function(contract){
     url:utils.urls.stream,
     method:'post',
     headers:{
-      'x-digger-contract':contract.req
+      'x-digger-contract':JSON.stringify(contract.req)
     }
   });
 
@@ -83,7 +83,7 @@ SupplyChain.prototype.stream = function(contract){
     method:'post',
     headers:{
       'Content-Type':'application/json',
-      'x-digger-contract':contract.req
+      'x-digger-contract':JSON.stringify(contract.req)
     }
   })
 
